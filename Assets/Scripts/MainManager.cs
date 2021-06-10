@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +10,9 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+
+    [SerializeField]
+    private Text bestScoreText;
     
     private bool m_Started = false;
     private int m_Points;
@@ -22,6 +23,7 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UpdateHighScore();
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -62,6 +64,11 @@ public class MainManager : MonoBehaviour
         }
     }
 
+    private void UpdateHighScore()
+    {
+        bestScoreText.text = "BestScore: " + GameManager.instance.bestScoreName + " :" + GameManager.instance.bestScore;
+    }
+
     void AddPoint(int point)
     {
         m_Points += point;
@@ -70,7 +77,18 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        if(m_Points > GameManager.instance.bestScore)
+        {
+            GameManager.instance.bestScore = m_Points;
+            GameManager.instance.bestScoreName = GameManager.instance.currentName;
+            GameManager.instance.SaveBestScore();
+        }
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
